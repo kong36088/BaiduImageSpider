@@ -22,6 +22,7 @@ class Crawler:
     # 睡眠时长
     __time_sleep = 0.1
     __amount = 0
+    __start_amount=0
 
     # 获取图片url内容等
     # t 下载图片时间间隔
@@ -37,7 +38,7 @@ class Crawler:
             global counter
             headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0'}
             url = 'http://image.baidu.com/search/avatarjson?tn=resultjsonavatarnew&ie=utf-8&word=' + search + '&cg=girl&pn=' + str(
-                    pn) + '&rn=60&itg=0&z=0&fr=&width=&height=&lm=-1&ic=0&s=0&st=-1&gsm=1e0000001e'
+                    self.__start_amount) + '&rn=60&itg=0&z=0&fr=&width=&height=&lm=-1&ic=0&s=0&st=-1&gsm=1e0000001e'
             # 设置header防ban
             try:
                 time.sleep(self.time_sleep)
@@ -105,12 +106,14 @@ class Crawler:
         return name[:name.find('.')]
 
     # page_number 页数 数量为 页数x60
-    def start(self, word, page_number):
+    # start_page 起始页数
+    def start(self, word, page_number=1,start_page=1):
         self.amount = page_number * 60
+        self.__start_amount=(start_page-1)*60
         self.__getImages(word)
 
 
 crawler = Crawler(0.05)
-crawler.start('美女', 1)
-#crawler.start('二次元 性感', 2)
+#crawler.start('美女', 1,2)
+crawler.start('二次元 性感', 3,3)
 #crawler.start('帅哥', 5)
