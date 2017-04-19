@@ -13,3 +13,10 @@
 ``` python
 python index.py
 ```
+
+# 博客
+
+[爬虫总结](http://www.jwlchina.cn/2016/02/06/python%E7%99%BE%E5%BA%A6%E5%9B%BE%E7%89%87%E7%88%AC%E8%99%AB/)
+
+效果图：
+![效果图](http://www.jwlchina.cn/uploads/python%E5%9B%BE%E7%89%87%E7%88%AC%E8%99%AB%E6%88%AA%E5%9B%BE.png)
