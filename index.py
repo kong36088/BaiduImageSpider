@@ -82,16 +82,19 @@ class Crawler:
                 time.sleep(self.time_sleep)
                 req = urllib.request.Request(url=url, headers=self.headers)
                 page = urllib.request.urlopen(req)
-                data = page.read().decode('utf8')
+                rsp = page.read().decode('unicode_escape')
             except UnicodeDecodeError as e:
+                print(e)
                 print('-----UnicodeDecodeErrorurl:', url)
             except urllib.error.URLError as e:
+                print(e)
                 print("-----urlErrorurl:", url)
             except socket.timeout as e:
+                print(e)
                 print("-----socket timout:", url)
             else:
                 # 解析json
-                rsp_data = json.loads(data)
+                rsp_data = json.loads(rsp)
                 self.__save_image(rsp_data, word)
                 # 读取下一页
                 print("下载下一页")
@@ -101,9 +104,14 @@ class Crawler:
         print("下载任务结束")
         return
 
-    # page_number 需要抓取数据页数 总抓取图片数量为 页数x60
-    # start_page 起始页数
     def start(self, word, spider_page_num=1, start_page=1):
+        """
+        爬虫入口
+        :param word: 抓取的关键词
+        :param spider_page_num: 需要抓取数据页数 总抓取图片数量为 页数x60
+        :param start_page:起始页数
+        :return:
+        """
         self.__start_amount = (start_page - 1) * 60
         self.__amount = spider_page_num * 60 + self.__start_amount
         self.__get_images(word)
@@ -112,5 +120,5 @@ class Crawler:
 if __name__ == '__main__':
     crawler = Crawler(0.05)
     # crawler.start('美女', 1, 2)
-    crawler.start('血常规', 3, 3)
+    crawler.start('二次元 美女', 3, 3)
     # crawler.start('帅哥', 5)
