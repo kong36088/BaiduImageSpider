@@ -39,8 +39,13 @@ class Crawler:
         for image_info in rsp_data['imgs']:
             try:
                 time.sleep(self.time_sleep)
-                fix = self.__get_suffix(image_info['objURL'])
-                urllib.request.urlretrieve(image_info['objURL'], './' + word + '/' + str(self.__counter) + str(fix))
+                suffix = self.__get_suffix(image_info['objURL'])
+                # 指定UA，减少403
+                opener = urllib.request.build_opener()
+                opener.addheaders = [('User-agent', 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:55.0) Gecko/20100101 Firefox/55.0')]
+                urllib.request.install_opener(opener)
+                # 保存图片
+                urllib.request.urlretrieve(image_info['objURL'], './' + word + '/' + str(self.__counter) + str(suffix))
             except urllib.error.HTTPError as urllib_err:
                 print(urllib_err)
                 continue
@@ -55,18 +60,12 @@ class Crawler:
         return
 
     # 获取后缀名
-    @staticmethod
-    def __get_suffix(name):
+    def __get_suffix(self, name):
         m = re.search(r'\.[^\.]*$', name)
         if m.group(0) and len(m.group(0)) <= 5:
             return m.group(0)
         else:
             return '.jpeg'
-
-    # 获取前缀
-    @staticmethod
-    def __get_prefix(name):
-        return name[:name.find('.')]
 
     # 开始获取
     def __get_images(self, word='美女'):
@@ -118,7 +117,8 @@ class Crawler:
 
 
 if __name__ == '__main__':
-    crawler = Crawler(0.05)
-    # crawler.start('美女', 1, 2)
-    crawler.start('二次元 美女', 3, 3)
-    # crawler.start('帅哥', 5)
+    crawler = Crawler(0.05)  # 抓取延迟为 0.05
+
+    # crawler.start('美女', 1, 2)  # 抓取关键词为 “美女”，总数为 1 页（即总共 1*60=60 张），开始页码为 2
+    crawler.start('二次元 美女', 10, 1)  # 抓取关键词为 “二次元 美女”，总数为 10 页（即总共 10*60=600 张），起始抓取的页码为 1
+    # crawler.start('帅哥', 5)  # 抓取关键词为 “帅哥”，总数为 10 页（即总共 10*60=600 张），起始抓取的页码为 5
