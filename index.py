@@ -22,6 +22,8 @@ class Crawler:
     __amount = 0
     __start_amount = 0
     __counter = 0
+    __height=''
+    __width=''
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0'}
 
     # 获取图片url内容等
@@ -80,14 +82,14 @@ class Crawler:
         return
 
     # 开始获取
-    def get_images(self, word='美女'):
+    def get_images(self, word):
         search = urllib.parse.quote(word)
         # pn int 图片数
         pn = self.__start_amount
         while pn < self.__amount:
 
             url = 'http://image.baidu.com/search/avatarjson?tn=resultjsonavatarnew&ie=utf-8&word=' + search + '&cg=girl&pn=' + str(
-                pn) + '&rn=60&itg=0&z=0&fr=&width=&height=&lm=-1&ic=0&s=0&st=-1&gsm=1e0000001e'
+                pn) + '&rn=60&itg=0&z=0&fr=&width='+self.__width+'&height='+self.__height+'&lm=-1&ic=0&s=0&st=-1&gsm=1e0000001e'
             # 设置header防ban
             try:
                 time.sleep(self.time_sleep)
@@ -115,7 +117,7 @@ class Crawler:
         print("下载任务结束")
         return
 
-    def start(self, word, spider_page_num=1, start_page=1):
+    def start(self, word='', spider_page_num=1, start_page=1,height='',width=''):
         """
         爬虫入口
         :param word: 抓取的关键词
@@ -125,12 +127,21 @@ class Crawler:
         """
         self.__start_amount = (start_page - 1) * 60
         self.__amount = spider_page_num * 60 + self.__start_amount
+        self.__height=height
+        self.__width=width
         self.get_images(word)
 
 
 if __name__ == '__main__':
     crawler = Crawler(0.05)  # 抓取延迟为 0.05
-
-    # crawler.start('美女', 10, 2)  # 抓取关键词为 “美女”，总数为 1 页（即总共 1*60=60 张），开始页码为 2
-    crawler.start('二次元 美女', 10, 1)  # 抓取关键词为 “二次元 美女”，总数为 10 页（即总共 10*60=600 张），起始抓取的页码为 1
-    # crawler.start('帅哥', 5)  # 抓取关键词为 “帅哥”，总数为 5 页（即总共 5*60=300 张）
+    print('请输入关键词：')
+    keyword = input()
+    print('请输入抓取的页数（默认为1）：')
+    pagenum=int(input())
+    print('请输入起始抓取的页码（默认为1）：')
+    startpage=int(input())
+    print('请输入图片的宽（抓取所有尺寸请留空）：')
+    width=input()
+    print('请输入图片的高（抓取所有尺寸请留空）：')
+    height=input()
+    crawler.start(keyword, pagenum, startpage,height,width)  # 抓取关键词为 “二次元 美女”，总数为 10 页（即总共 10*60=600 张），起始抓取的页码为 1
