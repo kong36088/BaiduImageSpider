@@ -48,7 +48,7 @@ class Crawler:
         self.__counter = len(os.listdir('./' + word)) + 1
         for image_info in rsp_data['data']:
             try:
-                if len(image_info['replaceUrl']) < 1:
+                if 'replaceUrl' not in image_info or len(image_info['replaceUrl']) < 1:
                     continue
                 obj_url = image_info['replaceUrl'][0]['ObjUrl']
                 thumb_url = image_info['thumbURL']
@@ -62,7 +62,12 @@ class Crawler:
                 ]
                 urllib.request.install_opener(opener)
                 # 保存图片
-                urllib.request.urlretrieve(url, './' + word + '/' + str(self.__counter) + str(suffix))
+                filepath = './%s/%s' % (word, str(self.__counter) + str(suffix))
+                urllib.request.urlretrieve(url, filepath)
+                if os.path.getsize(filepath) < 5:
+                    print("下载到了空文件，跳过!")
+                    os.unlink(filepath)
+                    continue
             except urllib.error.HTTPError as urllib_err:
                 print(urllib_err)
                 continue
@@ -77,7 +82,7 @@ class Crawler:
         return
 
     # 开始获取
-    def get_images(self, word='美女'):
+    def get_images(self, word):
         search = urllib.parse.quote(word)
         # pn int 图片数
         pn = self.__start_amount
@@ -142,6 +147,6 @@ if __name__ == '__main__':
         # 如果不指定参数，那么程序会按照下面进行执行
         crawler = Crawler(0.05)  # 抓取延迟为 0.05
 
-        crawler.start('美女', 10, 2, 10)  # 抓取关键词为 “美女”，总数为 1 页（即总共 1*60=60 张），开始页码为 2
-        # crawler.start('二次元 美女', 10, 1)  # 抓取关键词为 “二次元 美女”，总数为 10 页（即总共 10*60=600 张），起始抓取的页码为 1
-        # crawler.start('帅哥', 5)  # 抓取关键词为 “帅哥”，总数为 5 页（即总共 5*60=300 张）
+        crawler.start('美女', 10, 2, 30)  # 抓取关键词为 “美女”，总数为 1 页，开始页码为 2，每页30张（即总共 2*30=60 张）
+        # crawler.start('二次元 美女', 10, 1)  # 抓取关键词为 “二次元 美女”
+        # crawler.start('帅哥', 5)  # 抓取关键词为 “帅哥”
