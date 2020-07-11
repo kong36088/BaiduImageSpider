@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-
+import argparse
 import os
 import re
+import sys
 import urllib
 import json
 import socket
@@ -115,7 +116,7 @@ class Crawler:
         爬虫入口
         :param word: 抓取的关键词
         :param total_page: 需要抓取数据页数 总抓取图片数量为 页数 x per_page
-        :param start_page:起始页数
+        :param start_page:起始页码
         :param per_page: 每页数量
         :return:
         """
@@ -126,8 +127,21 @@ class Crawler:
 
 
 if __name__ == '__main__':
-    crawler = Crawler(0.05)  # 抓取延迟为 0.05
+    if len(sys.argv) > 1:
+        parser = argparse.ArgumentParser()
+        parser.add_argument("-w", "--word", type=str, help="抓取关键词", required=True)
+        parser.add_argument("-tp", "--total_page", type=int, help="需要抓取的总页数", required=True)
+        parser.add_argument("-sp", "--start_page", type=int, help="起始页数", required=True)
+        parser.add_argument("-pp", "--per_page", type=int, help="每页大小", choices=[10, 20, 30, 40, 50, 60, 70, 80, 90, 100], default=30, nargs='?')
+        parser.add_argument("-d", "--delay", type=float, help="抓取延时（间隔）", default=0.05)
+        args = parser.parse_args()
 
-    crawler.start('美女', 10, 2, 10)  # 抓取关键词为 “美女”，总数为 1 页（即总共 1*60=60 张），开始页码为 2
-    # crawler.start('二次元 美女', 10, 1)  # 抓取关键词为 “二次元 美女”，总数为 10 页（即总共 10*60=600 张），起始抓取的页码为 1
-    # crawler.start('帅哥', 5)  # 抓取关键词为 “帅哥”，总数为 5 页（即总共 5*60=300 张）
+        crawler = Crawler(args.delay)
+        crawler.start(args.word, args.total_page, args.start_page, args.per_page)  # 抓取关键词为 “美女”，总数为 1 页（即总共 1*60=60 张），开始页码为 2
+    else:
+        # 如果不指定参数，那么程序会按照下面进行执行
+        crawler = Crawler(0.05)  # 抓取延迟为 0.05
+
+        crawler.start('美女', 10, 2, 10)  # 抓取关键词为 “美女”，总数为 1 页（即总共 1*60=60 张），开始页码为 2
+        # crawler.start('二次元 美女', 10, 1)  # 抓取关键词为 “二次元 美女”，总数为 10 页（即总共 10*60=600 张），起始抓取的页码为 1
+        # crawler.start('帅哥', 5)  # 抓取关键词为 “帅哥”，总数为 5 页（即总共 5*60=300 张）
