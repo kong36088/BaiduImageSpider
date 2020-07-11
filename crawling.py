@@ -23,6 +23,7 @@ class Crawler:
     __start_amount = 0
     __counter = 0
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0'}
+    __per_page = 30
 
     # 获取图片url内容等
     # t 下载图片时间间隔
@@ -30,42 +31,37 @@ class Crawler:
         self.time_sleep = t
 
     # 获取后缀名
-    def get_suffix(self, name):
+    @staticmethod
+    def get_suffix(name):
         m = re.search(r'\.[^\.]*$', name)
         if m.group(0) and len(m.group(0)) <= 5:
             return m.group(0)
         else:
             return '.jpeg'
 
-    # 获取referrer，用于生成referrer
-    def get_referrer(self, url):
-        par = urllib.parse.urlparse(url)
-        if par.scheme:
-            return par.scheme + '://' + par.netloc
-        else:
-            return par.netloc
-
-        # 保存图片
+    # 保存图片
     def save_image(self, rsp_data, word):
         if not os.path.exists("./" + word):
             os.mkdir("./" + word)
         # 判断名字是否重复，获取图片长度
         self.__counter = len(os.listdir('./' + word)) + 1
-        for image_info in rsp_data['imgs']:
-
+        for image_info in rsp_data['data']:
             try:
+                if len(image_info['replaceUrl']) < 1:
+                    continue
+                obj_url = image_info['replaceUrl'][0]['ObjUrl']
+                thumb_url = image_info['thumbURL']
+                url = 'https://image.baidu.com/search/down?tn=download&ipn=dwnl&word=download&ie=utf8&fr=result&url=%s&thumburl=%s' % (urllib.parse.quote(obj_url), urllib.parse.quote(thumb_url))
                 time.sleep(self.time_sleep)
-                suffix = self.get_suffix(image_info['objURL'])
+                suffix = self.get_suffix(obj_url)
                 # 指定UA和referrer，减少403
-                refer = self.get_referrer(image_info['objURL'])
                 opener = urllib.request.build_opener()
                 opener.addheaders = [
-                    ('User-agent', 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:55.0) Gecko/20100101 Firefox/55.0'),
-                    ('Referer', refer)
+                    ('User-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'),
                 ]
                 urllib.request.install_opener(opener)
                 # 保存图片
-                urllib.request.urlretrieve(image_info['objURL'], './' + word + '/' + str(self.__counter) + str(suffix))
+                urllib.request.urlretrieve(url, './' + word + '/' + str(self.__counter) + str(suffix))
             except urllib.error.HTTPError as urllib_err:
                 print(urllib_err)
                 continue
@@ -86,14 +82,13 @@ class Crawler:
         pn = self.__start_amount
         while pn < self.__amount:
 
-            url = 'http://image.baidu.com/search/avatarjson?tn=resultjsonavatarnew&ie=utf-8&word=' + search + '&cg=girl&pn=' + str(
-                pn) + '&rn=60&itg=0&z=0&fr=&width=&height=&lm=-1&ic=0&s=0&st=-1&gsm=1e0000001e'
-            # 设置header防ban
+            url = 'https://image.baidu.com/search/acjson?tn=resultjson_com&ipn=rj&ct=201326592&is=&fp=result&queryWord=%s&cl=2&lm=-1&ie=utf-8&oe=utf-8&adpicid=&st=-1&z=&ic=&hd=&latest=&copyright=&word=%s&s=&se=&tab=&width=&height=&face=0&istype=2&qc=&nc=1&fr=&expermode=&force=&pn=%s&rn=%d&gsm=1e&1594447993172=' % (search, search, str(pn), self.__per_page)
+            # 设置header防403
             try:
                 time.sleep(self.time_sleep)
                 req = urllib.request.Request(url=url, headers=self.headers)
                 page = urllib.request.urlopen(req)
-                rsp = page.read().decode('unicode_escape')
+                rsp = page.read()
             except UnicodeDecodeError as e:
                 print(e)
                 print('-----UnicodeDecodeErrorurl:', url)
@@ -115,22 +110,24 @@ class Crawler:
         print("下载任务结束")
         return
 
-    def start(self, word, spider_page_num=1, start_page=1):
+    def start(self, word, total_page=1, start_page=1, per_page=30):
         """
         爬虫入口
         :param word: 抓取的关键词
-        :param spider_page_num: 需要抓取数据页数 总抓取图片数量为 页数x60
+        :param total_page: 需要抓取数据页数 总抓取图片数量为 页数 x per_page
         :param start_page:起始页数
+        :param per_page: 每页数量
         :return:
         """
-        self.__start_amount = (start_page - 1) * 60
-        self.__amount = spider_page_num * 60 + self.__start_amount
+        self.__per_page = per_page
+        self.__start_amount = (start_page - 1) * self.__per_page
+        self.__amount = total_page * self.__per_page + self.__start_amount
         self.get_images(word)
 
 
 if __name__ == '__main__':
     crawler = Crawler(0.05)  # 抓取延迟为 0.05
 
-    # crawler.start('美女', 10, 2)  # 抓取关键词为 “美女”，总数为 1 页（即总共 1*60=60 张），开始页码为 2
-    crawler.start('二次元 美女', 10, 1)  # 抓取关键词为 “二次元 美女”，总数为 10 页（即总共 10*60=600 张），起始抓取的页码为 1
+    crawler.start('美女', 10, 2, 10)  # 抓取关键词为 “美女”，总数为 1 页（即总共 1*60=60 张），开始页码为 2
+    # crawler.start('二次元 美女', 10, 1)  # 抓取关键词为 “二次元 美女”，总数为 10 页（即总共 10*60=600 张），起始抓取的页码为 1
     # crawler.start('帅哥', 5)  # 抓取关键词为 “帅哥”，总数为 5 页（即总共 5*60=300 张）
