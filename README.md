@@ -7,7 +7,7 @@
 
 # Required
 
-** 需要安装python版本 >= 3.6 **
+**需要安装python版本 >= 3.6**
 
 # 使用方法
 ```
@@ -38,7 +38,7 @@ python crawling.py --word "美女" --total_page 10 --start_page 0 --per_page 30
 图片默认保存在项目路径
 运行爬虫：
 ``` python
-python index.py
+python crawling.py
 ```
 
 # 博客
