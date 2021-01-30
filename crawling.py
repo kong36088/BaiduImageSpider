@@ -95,6 +95,7 @@ class Crawler:
                 req = urllib.request.Request(url=url, headers=self.headers)
                 page = urllib.request.urlopen(req)
                 rsp = page.read()
+                page.close()
             except UnicodeDecodeError as e:
                 print(e)
                 print('-----UnicodeDecodeErrorurl:', url)
@@ -110,9 +111,7 @@ class Crawler:
                 self.save_image(rsp_data, word)
                 # 读取下一页
                 print("下载下一页")
-                pn += 60
-            finally:
-                page.close()
+                pn += self.__per_page
         print("下载任务结束")
         return
 
