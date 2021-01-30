@@ -30,7 +30,7 @@ optional arguments:
 
 开始爬取图片
 ```
-python crawling.py --word "美女" --total_page 10 --start_page 0 --per_page 30
+python crawling.py --word "美女" --total_page 10 --start_page 1 --per_page 30
 ```
 
 
