@@ -107,7 +107,7 @@ class Crawler:
                 print("-----socket timout:", url)
             else:
                 # 解析json
-                rsp_data = json.loads(rsp)
+                rsp_data = json.loads(rsp.replace(b'\\',b''))
                 self.save_image(rsp_data, word)
                 # 读取下一页
                 print("下载下一页")
