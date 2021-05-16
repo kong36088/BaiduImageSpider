@@ -23,7 +23,7 @@ class Crawler:
     __amount = 0
     __start_amount = 0
     __counter = 0
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0'}
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0', 'Cookie': ''}
     __per_page = 30
 
     # 获取图片url内容等
@@ -39,6 +39,21 @@ class Crawler:
             return m.group(0)
         else:
             return '.jpeg'
+
+    @staticmethod
+    def handle_baidu_cookie(original_cookie, cookies):
+        """
+        :param string original_cookie:
+        :param list cookies:
+        :return string:
+        """
+        if not cookies:
+            return original_cookie
+        result = original_cookie
+        for cookie in cookies:
+            result += cookie.split(';')[0] + ';'
+        result.rstrip(';')
+        return result
 
     # 保存图片
     def save_image(self, rsp_data, word):
@@ -87,13 +102,13 @@ class Crawler:
         # pn int 图片数
         pn = self.__start_amount
         while pn < self.__amount:
-
             url = 'https://image.baidu.com/search/acjson?tn=resultjson_com&ipn=rj&ct=201326592&is=&fp=result&queryWord=%s&cl=2&lm=-1&ie=utf-8&oe=utf-8&adpicid=&st=-1&z=&ic=&hd=&latest=&copyright=&word=%s&s=&se=&tab=&width=&height=&face=0&istype=2&qc=&nc=1&fr=&expermode=&force=&pn=%s&rn=%d&gsm=1e&1594447993172=' % (search, search, str(pn), self.__per_page)
             # 设置header防403
             try:
                 time.sleep(self.time_sleep)
                 req = urllib.request.Request(url=url, headers=self.headers)
                 page = urllib.request.urlopen(req)
+                self.headers['Cookie'] = self.handle_baidu_cookie(self.headers['Cookie'], page.info().get_all('Set-Cookie'))
                 rsp = page.read()
                 page.close()
             except UnicodeDecodeError as e:
@@ -108,10 +123,13 @@ class Crawler:
             else:
                 # 解析json
                 rsp_data = json.loads(rsp)
-                self.save_image(rsp_data, word)
-                # 读取下一页
-                print("下载下一页")
-                pn += self.__per_page
+                if 'data' not in rsp_data:
+                    print("触发了反爬机制，自动重试！")
+                else:
+                    self.save_image(rsp_data, word)
+                    # 读取下一页
+                    print("下载下一页")
+                    pn += self.__per_page
         print("下载任务结束")
         return
 
