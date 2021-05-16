@@ -122,7 +122,7 @@ class Crawler:
                 print("-----socket timout:", url)
             else:
                 # 解析json
-                rsp_data = json.loads(rsp.replace(b'\\',b''))
+                rsp_data = json.loads(rsp)
                 if 'data' not in rsp_data:
                     print("触发了反爬机制，自动重试！")
                 else:
