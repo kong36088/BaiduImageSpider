@@ -6,7 +6,7 @@
 单线程爬取百度图片。
 
 
-顺带推荐一个付费好用的代理，结合爬虫使用更得劲：[SmartProxy 全球IP代理](https://www.smartproxy.cn/regist?invite=HV8QHR)1亿真实住宅IP资源。
+顺带推荐一个付费好用的代理：[SmartProxy 全球IP代理](https://www.smartproxy.cn/regist?invite=HV8QHR)1亿真实住宅IP资源。
 专业海外http代理商，千万优质纯净住宅IP资源，覆盖全球城市，高匿稳定提供100%原生住宅IP，支持社交账户，电商平台，网络数据收集等服务。
 成功率伪装度超高！！本人测试用过之后感觉速度确实嘎嘎快，很给力。
 搞跨境电商的用户可以用来tiktok养号，每个月还会更新一次代理IP池~
