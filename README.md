@@ -18,10 +18,6 @@
    <img src="https://user-images.githubusercontent.com/29977021/228770306-6c5d0b8a-c381-4be3-b500-e43fc47298b3.png" width="400px">
 </div>
 
-官网链接：https://www.smartproxy.cn/
-
-推荐码：HV8QHR
-
 专属注册链接：[https://www.smartproxy.cn/regist](https://www.smartproxy.cn/regist?invite=HV8QHR)
 
 # 爬虫工具 Required
